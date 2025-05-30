@@ -114,7 +114,7 @@ Route::get('/model_has_permission', [UserController::class, 'modelHasPermission'
 // ///////////////////////Add Model has Permissions//////////////////
 Route::post('/addmodel_has_permission', [UserController::class, 'storePermission'])->name('user.addmodel_has_permission');
 ////////////////////////////////////////////////////////////////////
-Route::get('/userview', [UserController::class, 'viewUser'])->name('user.viewUser');
+Route::get('/userview', [UserController::class, 'viewUsers'])->name('user.viewUser');
 
 // //////Direct permission asigned to user specific/////////////////////////////////////////////////////////
 Route::get('/asign-permission-to-user', function () {

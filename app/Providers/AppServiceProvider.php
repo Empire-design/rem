@@ -25,8 +25,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Passport::loadKeysFrom(__DIR__ . '/../secrets/oauth');
         Passport::ignoreRoutes();
-        // Gate::define('is-admin', function (User $user) {
-        //     return $user === Auth::id();
-        // });
+        Gate::define('is_admin', function (User $user) {
+            return $user->usertype === 'admin';
+        });
+        Gate::define('is_user', function (User $user) {
+            return $user->usertype === 'user';
+        });
     }
 }

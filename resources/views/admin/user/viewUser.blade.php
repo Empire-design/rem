@@ -31,7 +31,8 @@
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Usertype</th>
-                                                <th>Password</th>
+                                                <th>Role</th>
+                                                <th>Permission</th>
                                                 <th>Created_At</th>
                                                 <th>Updated_At</th>
                                                 {{-- <th>Edit</th>
@@ -40,15 +41,30 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($user as $users)
+                                            @foreach ($users as $user)
                                                 <tr>
-                                                    <td>{{ $users->id }}</td>
-                                                    <td>{{ $users->name }}</td>
-                                                    <td>{{ $users->email }}</td>
-                                                    <td>{{ $users->usertype }}</td>
-                                                    <td>{{ $users->password }}</td>
-                                                    <td> {{ $users->created_at->diffForHumans() }}</td>
-                                                    <td>{{ $users->updated_at }}</td>
+                                                    <td>{{ $user->id }}</td>
+                                                    <td>{{ $user->name }}</td>
+                                                    <td>{{ $user->email }}</td>
+                                                    <td>{{ $user->usertype }}</td>
+                                                    <td>
+                                                        @if (!empty($user->getRoleNames()))
+                                                        @foreach ($user->getRoleNames() as $role)
+                                                            <label class="badge badge-primary" for="">{{ $role }}</label>
+                                                        @endforeach
+                                                            
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if (!empty($user->getPermissionNames()))
+                                                        @foreach ($user->getPermissionNames() as $role)
+                                                            <label class="badge badge-primary" for="">{{ $role }}</label>
+                                                        @endforeach
+                                                            
+                                                        @endif
+                                                    </td>
+                                                    <td> {{ $user->created_at->diffForHumans() }}</td>
+                                                    <td>{{ $user->updated_at }}</td>
                                                     {{-- <td><a class="btn btn-primary"
                                                             href="{{ route('category.edit', $categories->id) }}">Edit</a>
                                                     </td>

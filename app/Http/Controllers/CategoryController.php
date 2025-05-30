@@ -2,93 +2,132 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
     // ////show form
     public function showForm()
     {
-        return view('admin.Category.addcategory');
+        if (Gate::allows('is_admin')) {
+
+            return view('admin.Category.addcategory');
+        } else {
+            return view('admin.dashboard');
+        }
     }
 
     // add category ////////////////////
     public function addCategory(Request $request)
     {
-        $category = Category::addCategory($request->name, $request->categorytype);
-        return response()->json([
-            'status' => true,
-            'category' => $category
-        ]);
+        if (Gate::allows('is_admin')) {
+
+            $category = Category::addCategory($request->name, $request->categorytype);
+            return response()->json([
+                'status' => true,
+                'category' => $category
+            ]);
+        } else {
+            return view('admin.dashboard');
+        }
     }
     // view category///////////////////
     public function viewCat()
     {
-        $user = Category::viewCategory();
-        // return view('admin.Category.viewcategory', compact('user'));
-        return response()->json([
-            'status' => true,
-            'user' => $user
-        ]);
+        if (Gate::allows('is_admin')) {
+
+            $user = Category::viewCategory();
+            // return view('admin.Category.viewcategory', compact('user'));
+            return response()->json([
+                'status' => true,
+                'user' => $user
+            ]);
+        } else {
+            return view('admin.dashboard');
+        }
     }
     // edit category///////
     public function editCategory($id)
     {
-        $categories = Category::editCategory($id);
-        //  view('admin.Category.edit', compact('categories'));
-          return response()->json([
-            'status' => true,
-            'user' => $categories
-        ]);
+        if (Gate::allows('is_admin')) {
+
+            $categories = Category::editCategory($id);
+            //  view('admin.Category.edit', compact('categories'));
+            return response()->json([
+                'status' => true,
+                'user' => $categories
+            ]);
+        } else {
+            return view('admin.dashboard');
+        }
     }
     // update category/////////////////
     public function updateCategory(Request $request, $id)
     {
-        $data = $request->only(['name', 'categorytype']);
-        $category = Category::updateCat($id, $data);
-        return response()->json([
-            'status' => true,
-            'category' => $category
-        ]);
+        if (Gate::allows('is_admin')) {
+
+            $data = $request->only(['name', 'categorytype']);
+            $category = Category::updateCat($id, $data);
+            return response()->json([
+                'status' => true,
+                'category' => $category
+            ]);
+        } else {
+            return view('admin.dashboard');
+        }
     }
 
     public function Deletes($id)
     {
-        $category = Category::Deletes($id);
-        // dd($category);
-        $category->delete();
-        return response()->json([
-            'status' => true,
-            'category' => $category
-        ]);
+        if (Gate::allows('is_admin')) {
+
+            $category = Category::Deletes($id);
+            // dd($category);
+            $category->delete();
+            return response()->json([
+                'status' => true,
+                'category' => $category
+            ]);
+        }
     }
 
     public function Show(Request $request)
     {
+        if (Gate::allows('is_admin')) {
 
-        $category = Category::all();
-        if ($request->expectsJson()) {
-            return response()->json($category);
+
+            $category = Category::all();
+            if ($request->expectsJson()) {
+                return response()->json($category);
+            } else {
+            }
+            return view('admin.Category.addcategory');
         } else {
+            return view('admin.dashboard');
         }
-        return view('admin.Category.addcategory');
     }
 
     // Added category ////////////////////
 
     public function Category(Request $request)
     {
-        // dd($request->all());
-        $response = Category::Category($request);
+        if (Gate::allows('is_admin')) {
 
-        if (($response['status'])) {
-            return redirect()->route('admin.viewcategory')->with('success', 'Category successfully inserted');
+            // dd($request->all());
+            $response = Category::Category($request);
+
+            if (($response['status'])) {
+                return redirect()->route('admin.viewcategory')->with('success', 'Category successfully inserted');
+            } else {
+                return redirect()->back()->with('error', 'Category has not inserted');
+            }
+            // return response()->json(1);
         } else {
-            return redirect()->back()->with('error', 'Category has not inserted');
+            return view('admin.dashboard');
         }
-        // return response()->json(1);
     }
 
     // View subcategory ////////////////////
@@ -103,62 +142,87 @@ class CategoryController extends Controller
 
     public function ViewCategory()
     {
-        $user = Category::getAllCategories();
-        return view('admin.Category.viewcategory', compact('user'));
+        if (Gate::allows('is_admin')) {
+
+            $user = Category::getAllCategories();
+            return view('admin.Category.viewcategory', compact('user'));
+        } else {
+            return view('admin.dashboard');
+        }
     }
 
     // Edit subcategory ////////////////////
 
     public function Edit(string $id)
     {
-        $categories = Category::find($id);
-        // dd($categories);
-        return view('admin.Category.edit', compact('categories'));
+        if (Gate::allows('is_admin')) {
+
+            $categories = Category::find($id);
+            // dd($categories);
+            return view('admin.Category.edit', compact('categories'));
+        } else {
+            return view('admin.dashboard');
+        }
     }
 
     // Update category ////////////////////
 
     public function Update(Request $request)
     {
-        $category = Category::find($request->id);
-        if (!$category) {
-            // dd($request->all());
-            return redirect()->back()->with('error', 'Category not found');
-        }
+        if (Gate::allows('is_admin')) {
 
-        $category->name = $request->name;
-        $category->categorytype = $request->categorytype;
-        $category->save();
+            $category = Category::find($request->id);
+            if (!$category) {
+                // dd($request->all());
+                return redirect()->back()->with('error', 'Category not found');
+            }
 
-        if ($category) {
-            return response()->json(["result" => "Successfully updated"]);
+            $category->name = $request->name;
+            $category->categorytype = $request->categorytype;
+            $category->save();
+
+            if ($category) {
+                return response()->json(["result" => "Successfully updated"]);
+            } else {
+                return redirect()->back()->with('error', ' not updated');
+            }
         } else {
-            return redirect()->back()->with('error', ' not updated');
+            return view('admin.dashboard');
         }
     }
     // Delete subcategory ////////////////////
 
     public function Delete($id)
     {
-        // dd($id);
-        $category = Category::find($id);
+        if (Gate::allows('is_admin')) {
 
-        if ($category) {
-            $category->delete();
-            return response()->json(['result', 'successfully deleted']);
-            // return redirect()->back()->with('success', 'Successfully deleted');
+            // dd($id);
+            $category = Category::find($id);
+
+            if ($category) {
+                $category->delete();
+                return response()->json(['result', 'successfully deleted']);
+                // return redirect()->back()->with('success', 'Successfully deleted');
+            } else {
+                return response()->json(['error', 'not  deleted']);
+
+                // return session()->flash('error', 'Category not deleted successfully');
+            }
         } else {
-            return response()->json(['error', 'not  deleted']);
-
-            // return session()->flash('error', 'Category not deleted successfully');
+            return view('admin.dashboard');
         }
     }
     // ////////////////////////////////////////////////////////
 
     public function Categoryfetch()
     {
-        $category = Category::all();
-        return view('admin.Category.viewcategory');
+        if (Gate::allows('is_admin')) {
+
+            $category = Category::all();
+            return view('admin.Category.viewcategory');
+        } else {
+            return view('admin.dashboard');
+        }
     }
     // ............................///////////////////////
 
